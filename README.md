@@ -1,2 +1,2 @@
 # lms-team-1
-LMS Project    yes
+LMS Project    no   
