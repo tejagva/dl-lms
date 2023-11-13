@@ -24,7 +24,7 @@ public class LearnerUserController {
 	@PostMapping("/save")
 	public LearnerUser save(@RequestBody LearnerUser lu) {
 
-		return null;
+		return lu;
 
 	}
 
@@ -37,5 +37,8 @@ public class LearnerUserController {
 			return "Api Not Working";
 		}
 	}
+	
+	
+	
 
 }
