@@ -26,7 +26,7 @@ public class LearnerUserController {
 	@PostMapping("/save")
 	public LearnerUser save(@RequestBody LearnerUser lu) {
 
-		return null;
+		return lu;
 
 	}
 
@@ -37,8 +37,14 @@ public class LearnerUserController {
 			throw new DbException("Db Not Connected");
 		} catch (Exception e) {
 			return ResponseEntity.ok("Db Connected");
+
 		}
 
+	}
+
+	@GetMapping("/login")
+	public String login() {
+		return "Connected To Back-End";
 	}
 
 }
