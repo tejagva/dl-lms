@@ -44,7 +44,14 @@ public class SecurityConfig {
 		}));
 
 		http.authorizeHttpRequests(
-				auth -> auth.requestMatchers("/user/testdb").authenticated().requestMatchers("/save").permitAll());
+
+				auth ->
+
+				{
+					auth.requestMatchers("/user/testdb").authenticated();
+					auth.requestMatchers("/save","/user/login").permitAll();
+
+				});
 		http.formLogin(Customizer.withDefaults()).httpBasic(Customizer.withDefaults());
 
 		return http.build();
