@@ -1,5 +1,5 @@
 
 echo .DS_Store > .gitignore
-/.metadata/*
+**/metadata/*
 
 
