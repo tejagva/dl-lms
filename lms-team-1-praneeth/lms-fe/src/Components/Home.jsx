@@ -13,6 +13,10 @@ const Home = () => {
     } catch (error) {
       console.error("Error fetching data: ", error);
       setMessage("Error connecting to backend");
+
+
+
+      // now
     }
   };
 
