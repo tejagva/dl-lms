@@ -1,4 +1,4 @@
 # LmsProject
 
-intern project new main yes
+intern project new praneeth
 
