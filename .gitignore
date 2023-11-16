@@ -1,4 +1,9 @@
 
 echo .DS_Store > .gitignore
+<<<<<<< HEAD
 /.metadata/*
+=======
+**/metadata/*
+
+>>>>>>> main
 

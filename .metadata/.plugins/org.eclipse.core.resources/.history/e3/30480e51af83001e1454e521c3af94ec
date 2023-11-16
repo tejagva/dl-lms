@@ -1,0 +1,43 @@
+package com.lms.exception;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import com.lms.exception.details.DbDetails;
+import com.lms.exception.details.EmptyDetails;
+import com.lms.exception.details.UserExistDetails;
+
+@ControllerAdvice
+public class GlobalException {
+
+	@ExceptionHandler(DbException.class)
+	public ResponseEntity<DbDetails> handleResourceNotFound(DbException db) {
+
+		DbDetails db1 = new DbDetails();
+
+		db1.setMessage(db.getMessage());
+
+		return new ResponseEntity<>(db1, HttpStatus.NOT_FOUND);
+	}
+
+	@ExceptionHandler(NoDetailsException.class)
+	public ResponseEntity<EmptyDetails> nodetailsException(NoDetailsException nde) {
+
+		EmptyDetails ed = new EmptyDetails();
+		ed.setMessage(nde.getMessage());
+
+		return new ResponseEntity<EmptyDetails>(ed, HttpStatus.NO_CONTENT);
+	}
+
+	@ExceptionHandler(UserExistException.class)
+	public ResponseEntity<Object> userExistException(UserExistDetails ued) {
+
+		UserExistDetails ed = new UserExistDetails();
+		ed.setMessage(ued.getMessage());
+
+		return new ResponseEntity<Object>(ed, HttpStatus.ALREADY_REPORTED);
+	}
+
+}
