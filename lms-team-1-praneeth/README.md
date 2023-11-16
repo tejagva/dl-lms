@@ -1,2 +1,2 @@
 # LmsProject
-intern project new main
+intern project new main no
