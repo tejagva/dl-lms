@@ -27,10 +27,10 @@ public class GlobalException {
 	public ResponseEntity<?> nameFound(NameFound nf, WebRequest wr) {
 
 		NameFoundDetails d = new NameFoundDetails();
-		d.setError("700");
-		d.setMessage("No user");
+		d.setError("100");
+		d.setMessage("User Already Registered");
 
-		return new ResponseEntity<Object>(d, HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<Object>(d, HttpStatus.FOUND);
 	}
 
 	@ExceptionHandler(EmailNotFoundException.class)

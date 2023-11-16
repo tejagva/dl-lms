@@ -8,7 +8,7 @@ import com.lms.entity.LearnerUser;
 
 public interface LearnerUserService {
 
-	public ResponseEntity<LearnerUser> saveLU(LearnerUser lu);
+	public LearnerUser saveLU(LearnerUser lu);
 
 	public List<LearnerUser> getLU(long id);
 
