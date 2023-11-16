@@ -1,0 +1,20 @@
+package com.lms.exception;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
+
+import com.lms.exception.details.NameFound;
+
+@ControllerAdvice
+public class GlobalException {
+
+	@ExceptionHandler(NameFound.class)
+	public ResponseEntity<NameFound> nameFound(NameFound nf, WebRequest wr) {
+
+		return new ResponseEntity<NameFound>(nf, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
+}

@@ -1,0 +1,50 @@
+package com.lms.exception;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
+
+import com.lms.dto.EmailNotFoundDetails;
+import com.lms.dto.NameFoundDetails;
+import com.lms.exception.details.EmailNotFoundException;
+import com.lms.exception.details.NameFound;
+
+@RestControllerAdvice
+@RequestMapping(produces = "application/json")
+@ResponseBody
+public class GlobalException  {
+
+	@ExceptionHandler(NameFound.class)
+	public ResponseEntity<?> nameFound(NameFound nf, WebRequest wr) {
+
+		NameFoundDetails d = new NameFoundDetails();
+		d.setError("700");
+		d.setMessage("No user");
+
+		return new ResponseEntity<Object>(d, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
+	@ExceptionHandler(EmailNotFoundException.class)
+	public ResponseEntity<?> emailNotFound(EmailNotFoundException enf, WebRequest wr) {
+
+		EmailNotFoundDetails efd = new EmailNotFoundDetails();
+		efd.setError("700");
+		efd.setMessage("User with Email Not Found");
+
+		return new ResponseEntity<Object>(efd, HttpStatus.NOT_FOUND);
+	}
+
+	 
+
+}

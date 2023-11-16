@@ -27,29 +27,28 @@ public class SecurityConfig {
 
 		http.csrf(csrf -> csrf.disable());
 		http.cors(cor -> cor.configurationSource(new CorsConfigurationSource() {
-
-			@Override
-			public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-
-				List<String> listoforigin = List.of("http://localhost:3000/");
-				List<String> listofmethods = List.of("GET", "POST", "PUT", "DELETE");
-				CorsConfiguration cfg = new CorsConfiguration();
-
-				cfg.setAllowedOrigins(listoforigin);
-				cfg.setAllowedMethods(listofmethods);
-
-				return cfg;
-
-			}
+		    @Override
+		    public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+		        List<String> listoforigin = List.of("http://localhost:3000/");
+		        List<String> listofmethods = List.of("GET", "POST", "PUT", "DELETE");
+		        List<String> listofheaders = List.of("*");
+		        CorsConfiguration cfg = new CorsConfiguration();
+		        cfg.setAllowedOrigins(listoforigin);
+		        cfg.setAllowedMethods(listofmethods);
+		        cfg.setAllowedHeaders(listofheaders);
+		        cfg.setAllowCredentials(true);
+		        return cfg;
+		    }
 		}));
+
 
 		http.authorizeHttpRequests(
 
 				auth ->
 
 				{
-					auth.requestMatchers("/user/testdb").authenticated();
-					auth.requestMatchers("/save","/user/login").permitAll();
+					//auth.requestMatchers("/user/testdb").authenticated();
+					auth.requestMatchers("/save", "/user/**").permitAll();
 
 				});
 		http.formLogin(Customizer.withDefaults()).httpBasic(Customizer.withDefaults());

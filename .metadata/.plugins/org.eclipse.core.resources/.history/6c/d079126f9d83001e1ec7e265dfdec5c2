@@ -1,0 +1,84 @@
+package com.lms.serviceImpl;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.lms.entity.LearnerUser;
+import com.lms.exception.NoDetailsException;
+import com.lms.exception.UserExistException;
+import com.lms.repository.LearnerUserRepo;
+import com.lms.service.LearnerUserService;
+
+@Service
+public class LearnerUserServiceImpl implements LearnerUserService {
+
+	@Autowired
+	private LearnerUserRepo lur;
+
+	@Override
+	public LearnerUser saveLU(LearnerUser lu) {
+
+		String email = lu.getEmail();
+
+		String name = "No";
+		String password = lu.getPassword();
+
+		if (email.equals(null) || name.equals(null) || password.equals(null)) {
+			throw new NoDetailsException("Fields are Empty");
+		} else if (getByemail(lu)) {
+			throw new UserExistException("Email Already Regsitered");
+		} else {
+
+			return lur.save(lu);
+		}
+
+	}
+
+	@Override
+	public Boolean getByemail(LearnerUser lu) {
+
+		boolean findByName = lur.existsByemail(lu.getEmail());
+
+		return findByName;
+	}
+
+	@Override
+	public List<LearnerUser> getLU(long id) {
+		return null;
+	}
+
+	@Override
+	public LearnerUser updateLU(LearnerUser lu) {
+		return null;
+	}
+
+	@Override
+	public void deleteLU(long id) {
+
+	}
+
+	@Override
+	public LearnerUser getby(LearnerUser lu) {
+		Optional<LearnerUser> findbyemail = lur.findByemail(lu.getEmail());
+
+		if (findbyemail.equals(null)) {
+			return findbyemail.get();
+
+		}
+
+		else if (findbyemail.get().getPassword().equals(lu.getPassword())) {
+			return findbyemail.get();
+		} else {
+			throw new UserExistException("No user");
+
+		}
+
+//		return findbyemail.stream().filter(fil -> fil.getPassword().equals(lu.getPassword())).findFirst()
+//				.orElseThrow(() -> new UsernameNotFoundException("No User With Email" + lu.getEmail()));
+
+	}
+
+}
