@@ -31,7 +31,7 @@ public class SecurityConfig {
 			@Override
 			public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
 
-				List<String> listoforigin = List.of("http://localhost:3000/");
+				List<String> listoforigin = List.of("*");
 				List<String> listofmethods = List.of("GET", "POST", "PUT", "DELETE");
 				CorsConfiguration cfg = new CorsConfiguration();
 
