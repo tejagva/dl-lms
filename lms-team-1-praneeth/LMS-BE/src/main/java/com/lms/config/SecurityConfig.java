@@ -61,7 +61,8 @@ public class SecurityConfig {
 					auth.requestMatchers("/user/login", "user/jwt").permitAll();
 
 				}).sessionManagement(ses -> ses.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authenticationProvider(ap()).addFilterBefore((Filter) jfl, UsernamePasswordAuthenticationFilter.class);
+				.authenticationProvider(ap())
+				.addFilterBefore((Filter) jfl, UsernamePasswordAuthenticationFilter.class);
 
 		;
 		http.formLogin(forn -> forn.loginPage("/user/login")).httpBasic(Customizer.withDefaults());
