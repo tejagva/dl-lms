@@ -58,7 +58,7 @@ public class SecurityConfig {
 
 				{
 					auth.requestMatchers("/user/api1", "/user/signup").authenticated();
-					auth.requestMatchers("user/jwt").permitAll();
+					auth.requestMatchers("user/login").permitAll();
 
 				}).sessionManagement(ses -> ses.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authenticationProvider(ap()).addFilterBefore((Filter) jfl, UsernamePasswordAuthenticationFilter.class);

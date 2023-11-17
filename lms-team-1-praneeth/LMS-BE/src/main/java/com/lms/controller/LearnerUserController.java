@@ -43,7 +43,7 @@ public class LearnerUserController {
 
 	}
 
-	@PostMapping("/jwt")
+	@PostMapping("/login")
 	public String getJwtToken(@RequestBody @Valid LearnerUserDto jwt) {
 
 		try {
