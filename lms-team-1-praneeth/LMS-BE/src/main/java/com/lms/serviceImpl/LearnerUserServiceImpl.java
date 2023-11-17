@@ -70,7 +70,7 @@ public class LearnerUserServiceImpl implements LearnerUserService {
 
 		if (lur.findByemail(lu.getEmail()).isEmpty()) {
 
-			throw new EmailNotFoundException();
+			throw new EmailNotFoundException("Email Not Found");
 		} else {
 
 			return new ResponseEntity<Object>(lur.findByemail(lu.getEmail()).get(), HttpStatus.OK);

@@ -58,14 +58,13 @@ public class SecurityConfig {
 
 				{
 					auth.requestMatchers("/user/api1", "/user/signup").authenticated();
-					auth.requestMatchers("/user/login", "user/jwt").permitAll();
+					auth.requestMatchers("user/jwt").permitAll();
 
 				}).sessionManagement(ses -> ses.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authenticationProvider(ap())
-				.addFilterBefore((Filter) jfl, UsernamePasswordAuthenticationFilter.class);
+				.authenticationProvider(ap()).addFilterBefore((Filter) jfl, UsernamePasswordAuthenticationFilter.class);
 
 		;
-		http.formLogin(forn -> forn.loginPage("/user/login")).httpBasic(Customizer.withDefaults());
+		http.formLogin(Customizer.withDefaults()).httpBasic(Customizer.withDefaults());
 
 		return http.build();
 	}
@@ -91,6 +90,7 @@ public class SecurityConfig {
 
 	@Bean
 	AuthenticationManager am(AuthenticationConfiguration config) throws Exception {
+
 		return config.getAuthenticationManager();
 	}
 

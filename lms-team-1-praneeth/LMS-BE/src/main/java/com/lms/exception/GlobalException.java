@@ -38,7 +38,7 @@ public class GlobalException {
 
 		EmailNotFoundDetails efd = new EmailNotFoundDetails();
 		efd.setError("700");
-		efd.setMessage("User with Email Not Found");
+		efd.setMessage(enf.getMessage());
 
 		return new ResponseEntity<Object>(efd, HttpStatus.NOT_FOUND);
 	}

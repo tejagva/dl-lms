@@ -23,7 +23,7 @@ public class LearnerUserUds implements UserDetailsService {
 
 		Optional<LearnerUser> findByemail = lur.findByemail(username);
 
-		return findByemail.map(details -> new LearnerUserUd(details)).orElseThrow(() -> new EmailNotFoundException());
+		return findByemail.map(details -> new LearnerUserUd(details)).orElseThrow(() -> new EmailNotFoundException("Email Not Found"));
 	}
 
 }

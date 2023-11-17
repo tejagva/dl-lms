@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,13 +46,20 @@ public class LearnerUserController {
 	@PostMapping("/jwt")
 	public String getJwtToken(@RequestBody @Valid LearnerUserDto jwt) {
 
-		Authentication authenticate = am
-				.authenticate(new UsernamePasswordAuthenticationToken(jwt.getEmail(), jwt.getPassword()));
+		try {
+			Authentication authenticate = am
+					.authenticate(new UsernamePasswordAuthenticationToken(jwt.getEmail(), jwt.getPassword()));
 
-		if (authenticate.isAuthenticated()) {
-			return js.genJwtToken(jwt.getEmail());
-		} else {
-			throw new EmailNotFoundException();
+			if (authenticate.isAuthenticated()) {
+				return js.genJwtToken(jwt.getEmail());
+			} else {
+				throw new EmailNotFoundException("Email Not Found");
+			}
+
+		}
+
+		catch (BadCredentialsException ex) {
+			throw new EmailNotFoundException("Password Incorrect");
 		}
 
 	}
@@ -69,22 +77,22 @@ public class LearnerUserController {
 		}
 	}
 
-	@GetMapping("/login")
-	public ResponseEntity<String> login1(@RequestBody @Valid LearnerUserDto lud) {
-
-		LearnerUser lu = LearnerUser.build(0, null, lud.getEmail(), lud.getPassword(), null);
-		ResponseEntity<?> getby = lus.getby(lu);
-
-		if (getby.equals(null)) {
-			throw new EmailNotFoundException();
-
-		} else {
-
-			return new ResponseEntity<String>("Welcome" + getby.getBody(), getby.getStatusCode());
-
-		}
-
-	}
+//	@GetMapping("/login")
+//	public ResponseEntity<String> login1(@RequestBody @Valid LearnerUserDto lud) {
+//
+//		LearnerUser lu = LearnerUser.build(0, null, lud.getEmail(), lud.getPassword(), null);
+//		ResponseEntity<?> getby = lus.getby(lu);
+//
+//		if (getby.equals(null)) {
+//			throw new EmailNotFoundException();
+//
+//		} else {
+//
+//			return new ResponseEntity<String>("Welcome" + getby.getBody(), getby.getStatusCode());
+//
+//		}
+//
+//	}
 
 	@GetMapping("/api1")
 	public String api() {
