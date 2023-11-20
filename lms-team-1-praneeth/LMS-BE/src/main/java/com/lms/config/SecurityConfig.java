@@ -58,7 +58,7 @@ public class SecurityConfig {
 
 				{
 					auth.requestMatchers("/user/api1", "/user/signup").authenticated();
-					auth.requestMatchers("user/login").permitAll();
+					auth.requestMatchers("user/login","/user/upload","/user/{email}").permitAll();
 
 				}).sessionManagement(ses -> ses.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authenticationProvider(ap()).addFilterBefore((Filter) jfl, UsernamePasswordAuthenticationFilter.class);

@@ -8,6 +8,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,5 +33,9 @@ public class LearnerUser {
 	private String password;
 	@NotEmpty(message = "role cannot be empty")
 	private String roles;
+
+	@Lob()
+	@Column(length = 100000)
+	private byte[] image;
 
 }
