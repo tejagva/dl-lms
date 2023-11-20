@@ -1,12 +1,13 @@
 package com.lms.serviceImpl;
 
-import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.zip.DataFormatException;
-import java.util.zip.Deflater;
-import java.util.zip.Inflater;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,20 +40,15 @@ public class LearnerUserServiceImpl implements LearnerUserService {
 		lu1.setPassword(pe.encode(lu.getPassword()));
 		lu1.setRoles(lu.getRoles());
 
-		Boolean byemail = getByemail(lu1);
-
-		if (byemail) {
-
+		if (getByemail(lu1)) {
 			return null;
 		} else {
 			return lur.save(lu1);
 		}
-
 	}
 
 	@Override
 	public Boolean getByemail(LearnerUser lu) {
-
 		boolean findByName = lur.existsByemail(lu.getEmail());
 		return findByName;
 	}
@@ -67,7 +63,6 @@ public class LearnerUserServiceImpl implements LearnerUserService {
 		} catch (Exception e) {
 			throw new EmailNotFoundException("Email not found");
 		}
-
 	}
 
 	@Override
@@ -82,97 +77,77 @@ public class LearnerUserServiceImpl implements LearnerUserService {
 
 	@Override
 	public void deleteLU(long id) {
-
+		return;
 	}
 
 	@Override
 	public ResponseEntity<?> getby(LearnerUser lu) {
 
 		if (lur.findByemail(lu.getEmail()).isEmpty()) {
-
 			throw new EmailNotFoundException("Email Not Found");
 		} else {
-
 			return new ResponseEntity<Object>(lur.findByemail(lu.getEmail()).get(), HttpStatus.OK);
 		}
-
 	}
 
 	@Override
-	public String saveImg(MultipartFile mp, String email) throws Exception {
+	public String saveImg(MultipartFile file, String email) throws Exception {
+
+		String filePath = "/Users/desettipraneeth/Desktop/images/" + file.getOriginalFilename();
+		Path filePathurl = Paths.get(filePath);
+		file.transferTo(filePathurl.toFile());
 
 		try {
-
 			Optional<LearnerUser> lu = lur.findByemail(email);
 			LearnerUser lu1 = lu.get();
-			lu1.setImage(compressImage(mp.getBytes()));
+			lu1.setImageurl(filePath);
 			LearnerUser imageData = lur.save(lu1);
-
 			if (imageData != null) {
-				return "File Uploaded Successfully :" + mp.getOriginalFilename().toLowerCase();
+				return "File Uploaded Successfully :" + file.getOriginalFilename().toLowerCase();
 			} else {
 				throw new Exception("Failed To Upload File");
 			}
 		} catch (Exception e) {
-
 			throw new EmailNotFoundException("Email not Found");
 		}
-
-	}
-
-	public static byte[] compressImage(byte[] data) {
-		Deflater deflater = new Deflater();
-		deflater.setLevel(Deflater.BEST_COMPRESSION);
-		deflater.setInput(data);
-		deflater.finish();
-
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
-		byte[] tmp = new byte[4 * 1024];
-
-		int compressedSize = 0;
-		int targetSize = 1000;
-
-		while (!deflater.finished() && compressedSize < targetSize) {
-			int size = deflater.deflate(tmp);
-			if (compressedSize + size <= targetSize) {
-				outputStream.write(tmp, 0, size);
-				compressedSize += size;
-			} else {
-				break;
-			}
-		}
-		try {
-			outputStream.close();
-		} catch (Exception ignored) {
-		}
-		return outputStream.toByteArray();
 	}
 
 	@Override
 	public byte[] downloadImage(String email) throws IOException, DataFormatException {
 
-		Optional<LearnerUser> img = lur.findByemail(email);
+		LearnerUser img = lur.findByemail(email).orElseThrow(() -> new EmailNotFoundException("Email not found"));
 
-		byte[] images1 = decompressImage(img.get().getImage());
+		String filePath = img.getImageurl();
+		byte[] images = Files.readAllBytes(new File(filePath).toPath());
 
-		return images1;
+		return images;
 	}
 
 	@Override
-	public byte[] decompressImage(byte[] data) {
-		Inflater inflater = new Inflater();
-		inflater.setInput(data);
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
-		byte[] tmp = new byte[4 * 1024];
+	public LearnerUser Luupdate(LearnerUser lu) {
+
 		try {
-			while (!inflater.finished()) {
-				int count = inflater.inflate(tmp);
-				outputStream.write(tmp, 0, count);
+			Optional<LearnerUser> fingbyemail = lur.findByemail(lu.getEmail());
+
+			LearnerUser lu1 = fingbyemail.get();
+
+			if (!(lu.getEmail()).isBlank()) {
+				lu1.setEmail(lu.getEmail());
+			} else if (!(lu.getPassword()).isBlank()) {
+				lu1.setPassword(lu.getPassword());
+			} else if (!(lu.getName()).isBlank()) {
+				lu1.setName(lu.getName());
+
+			} else if (!(lu.getImageurl()).isBlank()) {
+				lu1.setImageurl(lu.getImageurl());
 			}
-			outputStream.close();
-		} catch (Exception ignored) {
+
+			return lur.save(lu1);
 		}
-		return outputStream.toByteArray();
+
+		catch (Exception e) {
+			throw new EmailNotFoundException("Email Not Found");
+		}
 	}
 
 }

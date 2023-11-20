@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class NameFoundDetails {
+public class NameFoundDto {
 
 	private String error;
 	private String message;

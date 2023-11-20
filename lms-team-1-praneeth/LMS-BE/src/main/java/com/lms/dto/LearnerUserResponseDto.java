@@ -15,6 +15,6 @@ public class LearnerUserResponseDto {
 
 	private String roles;
 
-	private String image;
+	private byte[] imagepath;
 
 }

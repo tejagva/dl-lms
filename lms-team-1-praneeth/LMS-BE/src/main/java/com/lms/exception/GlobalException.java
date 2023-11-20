@@ -13,20 +13,20 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
-import com.lms.dto.EmailNotFoundDetails;
-import com.lms.dto.NameFoundDetails;
+import com.lms.dto.EmailNotFoundDto;
+import com.lms.dto.NameFoundDto;
 import com.lms.exception.details.EmailNotFoundException;
-import com.lms.exception.details.NameFound;
+import com.lms.exception.details.NameFoundException;
 
 @RestControllerAdvice
 @RequestMapping(produces = "application/json")
 @ResponseBody
 public class GlobalException {
 
-	@ExceptionHandler(NameFound.class)
-	public ResponseEntity<?> nameFound(NameFound nf, WebRequest wr) {
+	@ExceptionHandler(NameFoundException.class)
+	public ResponseEntity<?> nameFound(NameFoundException nf, WebRequest wr) {
 
-		NameFoundDetails d = new NameFoundDetails();
+		NameFoundDto d = new NameFoundDto();
 		d.setError("100");
 		d.setMessage("User Already Registered");
 
@@ -36,7 +36,7 @@ public class GlobalException {
 	@ExceptionHandler(EmailNotFoundException.class)
 	public ResponseEntity<?> emailNotFound(EmailNotFoundException enf, WebRequest wr) {
 
-		EmailNotFoundDetails efd = new EmailNotFoundDetails();
+		EmailNotFoundDto efd = new EmailNotFoundDto();
 		efd.setError("700");
 		efd.setMessage(enf.getMessage());
 

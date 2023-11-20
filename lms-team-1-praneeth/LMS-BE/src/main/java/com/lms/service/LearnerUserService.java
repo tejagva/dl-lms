@@ -30,6 +30,6 @@ public interface LearnerUserService {
 
 	Optional<LearnerUser> fingbyemail(String email);
 
-	byte[] decompressImage(byte[] data);
+	public LearnerUser Luupdate(LearnerUser lu1);
 
 }
