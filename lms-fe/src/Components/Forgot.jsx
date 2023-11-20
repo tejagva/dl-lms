@@ -2,7 +2,8 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 const Forgot = () => {
   return (
-    <div className='bg-dark d-flex justify-content-center align-items-center '>
+    <div>
+      <div className='bg-dark d-flex justify-content-center align-items-center '>
         <div className='bg-white rounded-3 col-sm-3'>
           <img src="https://digital-lync.konalms.com/assets/logo.ab024049.png" className='py-4' alt="logo" width={"200px"}/>
           <h4 className='fw-normal pb-2'>Forgot Your Password?</h4>
@@ -16,6 +17,7 @@ const Forgot = () => {
             <p className='text-center' style={{fontSize:"14px", fontWeight:"500"}}><Link to="/login" className='text-decoration-none'>Back to Digital Lync LMS</Link></p>
           </div>
         </div>
+    </div>
     </div>
   )
 }
