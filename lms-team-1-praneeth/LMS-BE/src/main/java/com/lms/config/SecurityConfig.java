@@ -21,7 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-import com.lms.serviceImpl.LearnerUserUds;
+import com.lms.serviceImpl.UserUds;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -58,7 +58,7 @@ public class SecurityConfig {
 
 				{
 					auth.requestMatchers("/user/api1", "/user/signup").authenticated();
-					auth.requestMatchers("user/login","/user/upload","/user/{email}").permitAll();
+					auth.requestMatchers("user/login","/user/upload","/user/{email}","/user/getotp","/user/verifyotp").permitAll();
 
 				}).sessionManagement(ses -> ses.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authenticationProvider(ap()).addFilterBefore((Filter) jfl, UsernamePasswordAuthenticationFilter.class);
@@ -71,7 +71,7 @@ public class SecurityConfig {
 
 	@Bean
 	UserDetailsService uds() {
-		return new LearnerUserUds();
+		return new UserUds();
 	}
 
 	@Bean

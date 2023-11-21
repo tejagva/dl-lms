@@ -37,7 +37,7 @@ public class GlobalException {
 	public ResponseEntity<?> emailNotFound(EmailNotFoundException enf, WebRequest wr) {
 
 		EmailNotFoundDto efd = new EmailNotFoundDto();
-		efd.setError("700");
+		efd.setError("504");
 		efd.setMessage(enf.getMessage());
 
 		return new ResponseEntity<Object>(efd, HttpStatus.NOT_FOUND);

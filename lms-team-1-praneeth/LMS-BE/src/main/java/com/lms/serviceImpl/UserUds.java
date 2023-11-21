@@ -8,22 +8,22 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.lms.entity.LearnerUser;
+import com.lms.entity.User;
 import com.lms.exception.details.EmailNotFoundException;
-import com.lms.repository.LearnerUserRepo;
+import com.lms.repository.UserRepo;
 
 @Service
-public class LearnerUserUds implements UserDetailsService {
+public class UserUds implements UserDetailsService {
 
 	@Autowired
-	private LearnerUserRepo lur;
+	private UserRepo lur;
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-		Optional<LearnerUser> findByemail = lur.findByemail(username);
+		Optional<User> findByemail = lur.findByemail(username);
 
-		return findByemail.map(details -> new LearnerUserUd(details)).orElseThrow(() -> new EmailNotFoundException("Email Not Found"));
+		return findByemail.map(details -> new UserUd(details)).orElseThrow(() -> new EmailNotFoundException("Email Not Found"));
 	}
 
 }

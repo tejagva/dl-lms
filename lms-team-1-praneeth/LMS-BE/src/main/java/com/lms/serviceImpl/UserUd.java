@@ -9,9 +9,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.lms.entity.LearnerUser;
+import com.lms.entity.User;
 
-public class LearnerUserUd implements UserDetails {
+public class UserUd implements UserDetails {
 
 	private static final long serialVersionUID = 1L;
 
@@ -19,7 +19,7 @@ public class LearnerUserUd implements UserDetails {
 	private String pass;
 	private List<GrantedAuthority> authorites;
 
-	public LearnerUserUd(LearnerUser lud) {
+	public UserUd(User lud) {
 		email = lud.getEmail();
 		pass = lud.getPassword();
 		authorites = Arrays.stream(lud.getRoles().split(",")).map(role -> new SimpleGrantedAuthority("ROLE_" + role))

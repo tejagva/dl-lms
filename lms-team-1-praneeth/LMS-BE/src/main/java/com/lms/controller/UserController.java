@@ -1,6 +1,7 @@
 package com.lms.controller;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.zip.DataFormatException;
 
@@ -19,33 +20,43 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.lms.dto.LearnerUserDto;
-import com.lms.dto.LearnerUserResponseDto;
-import com.lms.entity.LearnerUser;
+import com.lms.dto.UserDto;
+import com.lms.dto.UserResponseDto;
+import com.lms.dto.UserVerifyDto;
+import com.lms.entity.User;
 import com.lms.exception.details.EmailNotFoundException;
 import com.lms.exception.details.NameFoundException;
-import com.lms.service.LearnerUserService;
+import com.lms.service.UserService;
+import com.lms.serviceImpl.EmailService;
 import com.lms.serviceImpl.JwtService;
+import com.lms.serviceImpl.OtpService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 
 @RestController
 @RequestMapping("/user")
-public class LearnerUserController {
+public class UserController {
 
 	@Autowired
-	private LearnerUserService lus;
+	private UserService lus;
 
 	@Autowired
 	private JwtService js;
 
 	@Autowired
 	private AuthenticationManager am;
+
+	@Autowired
+	private OtpService otps;
+
+	@Autowired
+	private EmailService es;
 
 	/*
 	 * 
@@ -65,8 +76,7 @@ public class LearnerUserController {
 	 */
 
 	@PostMapping(value = "/login")
-	public ResponseEntity<?> getJwtToken(@RequestBody @Valid LearnerUserDto jwt)
-			throws IOException, DataFormatException {
+	public ResponseEntity<?> getJwtToken(@RequestBody @Valid UserDto jwt) throws IOException, DataFormatException {
 
 		try {
 			Authentication authenticate = am
@@ -75,15 +85,15 @@ public class LearnerUserController {
 			if (authenticate.isAuthenticated()) {
 
 				String genJwtToken = js.genJwtToken(jwt.getEmail());
-				Optional<LearnerUser> output = lus.fingbyemail(jwt.getEmail());
+				Optional<User> output = lus.fingbyemail(jwt.getEmail());
 
 				byte[] downloadImage = lus.downloadImage(jwt.getEmail());
 
 				HttpHeaders headers = new HttpHeaders();
 				headers.setContentType(MediaType.APPLICATION_JSON);
 
-				LearnerUserResponseDto ld2 = new LearnerUserResponseDto(output.get().getName(), genJwtToken,
-						output.get().getRoles(), downloadImage);
+				UserResponseDto ld2 = new UserResponseDto(output.get().getName(), genJwtToken, output.get().getRoles(),
+						downloadImage);
 
 				return ResponseEntity.ok().headers(headers).body(ld2);
 			} else {
@@ -102,13 +112,13 @@ public class LearnerUserController {
 
 	@PostMapping("/signup")
 	@PreAuthorize("hasAuthority('superadmin')")
-	public ResponseEntity<LearnerUser> signUp(@RequestBody @Valid LearnerUser lu) {
+	public ResponseEntity<User> signUp(@RequestBody @Valid User lu) {
 
-		LearnerUser saveLU = lus.saveLU(lu);
+		User saveLU = lus.saveLU(lu);
 		if (saveLU.equals(null)) {
 			throw new NameFoundException();
 		} else {
-			return new ResponseEntity<LearnerUser>(saveLU, HttpStatus.CREATED);
+			return new ResponseEntity<User>(saveLU, HttpStatus.CREATED);
 		}
 	}
 
@@ -148,9 +158,9 @@ public class LearnerUserController {
 	}
 
 	@PostMapping("/update")
-	public ResponseEntity<String> learnerUserUpdate(@RequestBody LearnerUser lu) {
+	public ResponseEntity<String> learnerUserUpdate(@RequestBody User lu) {
 
-		LearnerUser luupdate = lus.Luupdate(lu);
+		User luupdate = lus.Luupdate(lu);
 
 		if (luupdate.equals(null)) {
 			throw new EmailNotFoundException("Email not Found");
@@ -158,6 +168,30 @@ public class LearnerUserController {
 			return new ResponseEntity<String>("User details updated", HttpStatus.ACCEPTED);
 		}
 
+	}
+
+	@GetMapping("/getotp")
+	public ResponseEntity<?> getotp(@RequestParam String email) throws Exception {
+
+		String generateOtp = otps.generateOtp();
+
+		es.sendOtpEmail(email, generateOtp);
+
+		UserVerifyDto userVerifyDto = new UserVerifyDto(email, generateOtp, LocalDateTime.now());
+		lus.saveotp(userVerifyDto);
+
+		return new ResponseEntity<String>("OTP SENT", HttpStatus.OK);
+	}
+
+	@PostMapping("/verifyotp")
+	public ResponseEntity<String> verifyAccount(@RequestParam("email") String email, @RequestParam("otp") String otp) {
+		boolean verifyAccount = lus.verifyAccount(email, otp);
+
+		if (verifyAccount) {
+			return new ResponseEntity<String>("OTP Verified", HttpStatus.OK);
+		} else {
+			return new ResponseEntity<String>("Invalid OTP", HttpStatus.BAD_REQUEST);
+		}
 	}
 
 }

@@ -8,28 +8,33 @@ import java.util.zip.DataFormatException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.lms.entity.LearnerUser;
+import com.lms.dto.UserVerifyDto;
+import com.lms.entity.User;
 
-public interface LearnerUserService {
+public interface UserService {
 
-	public LearnerUser saveLU(LearnerUser lu);
+	public User saveLU(User lu);
 
-	public List<LearnerUser> getLU(long id);
+	public List<User> getLU(long id);
 
-	public LearnerUser updateLU(LearnerUser lu);
+	public User updateLU(User lu);
 
 	public void deleteLU(long id);
 
-	Boolean getByemail(LearnerUser lu);
+	Boolean getByemail(User lu);
 
-	public ResponseEntity<?> getby(LearnerUser lu);
+	public ResponseEntity<?> getby(User lu);
 
 	public String saveImg(MultipartFile file, String name) throws Exception;
 
 	byte[] downloadImage(String email) throws IOException, DataFormatException;
 
-	Optional<LearnerUser> fingbyemail(String email);
+	Optional<User> fingbyemail(String email);
 
-	public LearnerUser Luupdate(LearnerUser lu1);
+	public User Luupdate(User lu1);
+
+	boolean verifyAccount(String email, String otp);
+
+	boolean saveotp(UserVerifyDto uvt);
 
 }

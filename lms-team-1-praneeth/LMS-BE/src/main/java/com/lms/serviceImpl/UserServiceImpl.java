@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.zip.DataFormatException;
@@ -16,24 +18,29 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.lms.entity.LearnerUser;
+import com.lms.dto.UserVerifyDto;
+import com.lms.entity.User;
 import com.lms.exception.details.EmailNotFoundException;
-import com.lms.repository.LearnerUserRepo;
-import com.lms.service.LearnerUserService;
+import com.lms.repository.OtpRepo;
+import com.lms.repository.UserRepo;
+import com.lms.service.UserService;
 
 @Service
-public class LearnerUserServiceImpl implements LearnerUserService {
+public class UserServiceImpl implements UserService {
 
 	@Autowired
-	private LearnerUserRepo lur;
+	private UserRepo lur;
 
 	@Autowired
 	private PasswordEncoder pe;
 
-	@Override
-	public LearnerUser saveLU(LearnerUser lu) {
+	@Autowired
+	private OtpRepo or;
 
-		LearnerUser lu1 = new LearnerUser();
+	@Override
+	public User saveLU(User lu) {
+
+		User lu1 = new User();
 
 		lu1.setName(lu.getName());
 		lu1.setEmail(lu.getEmail());
@@ -48,15 +55,15 @@ public class LearnerUserServiceImpl implements LearnerUserService {
 	}
 
 	@Override
-	public Boolean getByemail(LearnerUser lu) {
+	public Boolean getByemail(User lu) {
 		boolean findByName = lur.existsByemail(lu.getEmail());
 		return findByName;
 	}
 
 	@Override
-	public Optional<LearnerUser> fingbyemail(String email) {
+	public Optional<User> fingbyemail(String email) {
 
-		Optional<LearnerUser> findByemail;
+		Optional<User> findByemail;
 		try {
 			findByemail = lur.findByemail(email);
 			return findByemail;
@@ -66,12 +73,12 @@ public class LearnerUserServiceImpl implements LearnerUserService {
 	}
 
 	@Override
-	public List<LearnerUser> getLU(long id) {
+	public List<User> getLU(long id) {
 		return null;
 	}
 
 	@Override
-	public LearnerUser updateLU(LearnerUser lu) {
+	public User updateLU(User lu) {
 		return null;
 	}
 
@@ -81,7 +88,7 @@ public class LearnerUserServiceImpl implements LearnerUserService {
 	}
 
 	@Override
-	public ResponseEntity<?> getby(LearnerUser lu) {
+	public ResponseEntity<?> getby(User lu) {
 
 		if (lur.findByemail(lu.getEmail()).isEmpty()) {
 			throw new EmailNotFoundException("Email Not Found");
@@ -98,10 +105,10 @@ public class LearnerUserServiceImpl implements LearnerUserService {
 		file.transferTo(filePathurl.toFile());
 
 		try {
-			Optional<LearnerUser> lu = lur.findByemail(email);
-			LearnerUser lu1 = lu.get();
+			Optional<User> lu = lur.findByemail(email);
+			User lu1 = lu.get();
 			lu1.setImageurl(filePath);
-			LearnerUser imageData = lur.save(lu1);
+			User imageData = lur.save(lu1);
 			if (imageData != null) {
 				return "File Uploaded Successfully :" + file.getOriginalFilename().toLowerCase();
 			} else {
@@ -115,7 +122,7 @@ public class LearnerUserServiceImpl implements LearnerUserService {
 	@Override
 	public byte[] downloadImage(String email) throws IOException, DataFormatException {
 
-		LearnerUser img = lur.findByemail(email).orElseThrow(() -> new EmailNotFoundException("Email not found"));
+		User img = lur.findByemail(email).orElseThrow(() -> new EmailNotFoundException("Email not found"));
 
 		String filePath = img.getImageurl();
 		byte[] images = Files.readAllBytes(new File(filePath).toPath());
@@ -124,12 +131,12 @@ public class LearnerUserServiceImpl implements LearnerUserService {
 	}
 
 	@Override
-	public LearnerUser Luupdate(LearnerUser lu) {
+	public User Luupdate(User lu) {
 
 		try {
-			Optional<LearnerUser> fingbyemail = lur.findByemail(lu.getEmail());
+			Optional<User> fingbyemail = lur.findByemail(lu.getEmail());
 
-			LearnerUser lu1 = fingbyemail.get();
+			User lu1 = fingbyemail.get();
 
 			if (!(lu.getEmail()).isBlank()) {
 				lu1.setEmail(lu.getEmail());
@@ -146,6 +153,35 @@ public class LearnerUserServiceImpl implements LearnerUserService {
 		}
 
 		catch (Exception e) {
+			throw new EmailNotFoundException("Email Not Found");
+		}
+	}
+
+	@Override
+	public boolean saveotp(UserVerifyDto uvt) {
+
+		if (!or.save(uvt).equals(null)) {
+			return true;
+		} else {
+			return false;
+		}
+
+	}
+
+	@Override
+	public boolean verifyAccount(String email, String otp) {
+
+		Optional<UserVerifyDto> findByemail;
+		try {
+			findByemail = or.findByemail(email);
+
+			if (findByemail.get().getOtp().equals(otp) && Duration
+					.between(findByemail.get().getOtpGeneratedTime(), LocalDateTime.now()).getSeconds() < (1 * 60)) {
+				return true;
+			} else {
+				return false;
+			}
+		} catch (Exception e) {
 			throw new EmailNotFoundException("Email Not Found");
 		}
 	}

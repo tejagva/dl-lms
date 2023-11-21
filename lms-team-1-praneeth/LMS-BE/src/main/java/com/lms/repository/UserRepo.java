@@ -5,14 +5,14 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.lms.entity.LearnerUser;
+import com.lms.entity.User;
 
 @Repository
-public interface LearnerUserRepo extends JpaRepository<LearnerUser, Long> {
+public interface UserRepo extends JpaRepository<User, Long> {
 
 	boolean existsByemail(String email);
 
-	Optional<LearnerUser> findByemail(String email);
+	Optional<User> findByemail(String email);
 	
 
 }
