@@ -19,7 +19,14 @@ public class EmailService {
 		MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);
 		mimeMessageHelper.setTo(email);
 		mimeMessageHelper.setSubject("Verify OTP");
-		mimeMessageHelper.setText("OTP : " + otp.formatted(email, otp), true);
+		mimeMessageHelper.setText(
+				"""
+						<div>
+						  <a href="http://localhost:8080/user/verifyotp?email=%s&otp=%s" target="_blank">click link to verify</a>
+						</div>
+						"""
+						.formatted(email, otp),
+				true);
 		jms.send(mimeMessage);
 	}
 }

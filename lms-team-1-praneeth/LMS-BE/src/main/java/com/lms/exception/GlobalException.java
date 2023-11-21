@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
+import com.lms.dto.CustomDto;
 import com.lms.dto.EmailNotFoundDto;
 import com.lms.dto.NameFoundDto;
+import com.lms.exception.details.CustomException;
 import com.lms.exception.details.EmailNotFoundException;
 import com.lms.exception.details.NameFoundException;
 
@@ -22,6 +24,16 @@ import com.lms.exception.details.NameFoundException;
 @RequestMapping(produces = "application/json")
 @ResponseBody
 public class GlobalException {
+
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public Map<String, String> handleInvalidArgument(MethodArgumentNotValidException ex) {
+		Map<String, String> errorMap = new HashMap<>();
+		ex.getBindingResult().getFieldErrors().forEach(error -> {
+			errorMap.put(error.getField(), error.getDefaultMessage());
+		});
+		return errorMap;
+	}
 
 	@ExceptionHandler(NameFoundException.class)
 	public ResponseEntity<?> nameFound(NameFoundException nf, WebRequest wr) {
@@ -43,14 +55,11 @@ public class GlobalException {
 		return new ResponseEntity<Object>(efd, HttpStatus.NOT_FOUND);
 	}
 
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public Map<String, String> handleInvalidArgument(MethodArgumentNotValidException ex) {
-		Map<String, String> errorMap = new HashMap<>();
-		ex.getBindingResult().getFieldErrors().forEach(error -> {
-			errorMap.put(error.getField(), error.getDefaultMessage());
-		});
-		return errorMap;
+	@ExceptionHandler(CustomException.class)
+	public ResponseEntity<?> custom(CustomException ce, WebRequest wr) {
+
+		CustomDto cd = new CustomDto(ce.getMessage(), "404");
+		return new ResponseEntity<Object>(cd, HttpStatus.BAD_REQUEST);
 	}
 
 }

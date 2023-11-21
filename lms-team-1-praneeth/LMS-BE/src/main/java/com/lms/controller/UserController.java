@@ -2,6 +2,7 @@ package com.lms.controller;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.Optional;
 import java.util.zip.DataFormatException;
 
@@ -18,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,6 +31,7 @@ import com.lms.dto.UserDto;
 import com.lms.dto.UserResponseDto;
 import com.lms.dto.UserVerifyDto;
 import com.lms.entity.User;
+import com.lms.exception.details.CustomException;
 import com.lms.exception.details.EmailNotFoundException;
 import com.lms.exception.details.NameFoundException;
 import com.lms.service.UserService;
@@ -88,19 +91,21 @@ public class UserController {
 				Optional<User> output = lus.fingbyemail(jwt.getEmail());
 
 				byte[] downloadImage = lus.downloadImage(jwt.getEmail());
+				String encodeToString = Base64.getEncoder().encodeToString(downloadImage);
+				String img = "data:image/png;base64 " + encodeToString;
 
 				HttpHeaders headers = new HttpHeaders();
 				headers.setContentType(MediaType.APPLICATION_JSON);
 
 				UserResponseDto ld2 = new UserResponseDto(output.get().getName(), genJwtToken, output.get().getRoles(),
-						downloadImage);
+						img);
 
 				return ResponseEntity.ok().headers(headers).body(ld2);
 			} else {
 				throw new EmailNotFoundException("Email Not Found");
 			}
 		} catch (BadCredentialsException ex) {
-			throw new EmailNotFoundException("Password Incorrect");
+			throw new CustomException("Password Incorrect");
 		}
 	}
 
@@ -152,21 +157,18 @@ public class UserController {
 	public ResponseEntity<?> downloadImage(@PathVariable("email") String email)
 			throws IOException, DataFormatException {
 		byte[] imageData = lus.downloadImage(email);
-
-		return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.valueOf("image/jpeg")).body(imageData);
+		String encodeToString = Base64.getEncoder().encodeToString(imageData);
+		String img = "data:image/png;base64 " + encodeToString;
+		return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.TEXT_HTML).body(img);
 
 	}
 
-	@PostMapping("/update")
+	@PutMapping("/update")
 	public ResponseEntity<String> learnerUserUpdate(@RequestBody User lu) {
 
-		User luupdate = lus.Luupdate(lu);
+		lus.Luupdate(lu);
 
-		if (luupdate.equals(null)) {
-			throw new EmailNotFoundException("Email not Found");
-		} else {
-			return new ResponseEntity<String>("User details updated", HttpStatus.ACCEPTED);
-		}
+		return new ResponseEntity<String>("User details updated", HttpStatus.ACCEPTED);
 
 	}
 
@@ -183,7 +185,7 @@ public class UserController {
 		return new ResponseEntity<String>("OTP SENT", HttpStatus.OK);
 	}
 
-	@PostMapping("/verifyotp")
+	@GetMapping("/verifyotp")
 	public ResponseEntity<String> verifyAccount(@RequestParam("email") String email, @RequestParam("otp") String otp) {
 		boolean verifyAccount = lus.verifyAccount(email, otp);
 

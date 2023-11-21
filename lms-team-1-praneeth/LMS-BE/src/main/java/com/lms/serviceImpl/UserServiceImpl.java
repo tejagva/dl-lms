@@ -1,10 +1,6 @@
 package com.lms.serviceImpl;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.lms.dto.UserVerifyDto;
 import com.lms.entity.User;
+import com.lms.exception.details.CustomException;
 import com.lms.exception.details.EmailNotFoundException;
 import com.lms.repository.OtpRepo;
 import com.lms.repository.UserRepo;
@@ -68,7 +65,7 @@ public class UserServiceImpl implements UserService {
 			findByemail = lur.findByemail(email);
 			return findByemail;
 		} catch (Exception e) {
-			throw new EmailNotFoundException("Email not found");
+			throw new EmailNotFoundException("Email Not Found");
 		}
 	}
 
@@ -98,63 +95,55 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public String saveImg(MultipartFile file, String email) throws Exception {
+	public String saveImg(MultipartFile mp, String email) throws Exception {
 
-		String filePath = "/Users/desettipraneeth/Desktop/images/" + file.getOriginalFilename();
-		Path filePathurl = Paths.get(filePath);
-		file.transferTo(filePathurl.toFile());
-
+		User op = lur.findByemail(email).orElseThrow(() -> new EmailNotFoundException("Email Not Found"));
 		try {
-			Optional<User> lu = lur.findByemail(email);
-			User lu1 = lu.get();
-			lu1.setImageurl(filePath);
-			User imageData = lur.save(lu1);
-			if (imageData != null) {
-				return "File Uploaded Successfully :" + file.getOriginalFilename().toLowerCase();
-			} else {
-				throw new Exception("Failed To Upload File");
-			}
-		} catch (Exception e) {
-			throw new EmailNotFoundException("Email not Found");
+			op.setImg(mp.getBytes());
+			lur.save(op);
+			return "Image File Uploaded Successfully :" + mp.getOriginalFilename().toLowerCase();
+		} catch (IOException e) {
+			throw new CustomException("Incorrect Image File");
 		}
+
 	}
 
 	@Override
 	public byte[] downloadImage(String email) throws IOException, DataFormatException {
 
-		User img = lur.findByemail(email).orElseThrow(() -> new EmailNotFoundException("Email not found"));
+		User img = lur.findByemail(email).orElseThrow(() -> new EmailNotFoundException("Email Not Found"));
 
-		String filePath = img.getImageurl();
-		byte[] images = Files.readAllBytes(new File(filePath).toPath());
+		byte[] img2 = img.getImg();
 
-		return images;
+		return img2;
 	}
 
 	@Override
 	public User Luupdate(User lu) {
 
-		try {
-			Optional<User> fingbyemail = lur.findByemail(lu.getEmail());
+		User lu1;
+		if (lu.getEmail() == null && lu.getImg() == null && lu.getName() == null && lu.getPassword() == null) {
+			throw new CustomException("Empty Details Failed To Update:");
 
-			User lu1 = fingbyemail.get();
-
-			if (!(lu.getEmail()).isBlank()) {
-				lu1.setEmail(lu.getEmail());
-			} else if (!(lu.getPassword()).isBlank()) {
-				lu1.setPassword(lu.getPassword());
-			} else if (!(lu.getName()).isBlank()) {
-				lu1.setName(lu.getName());
-
-			} else if (!(lu.getImageurl()).isBlank()) {
-				lu1.setImageurl(lu.getImageurl());
-			}
-
-			return lur.save(lu1);
+		} else {
+			lu1 = lur.findByemail(lu.getEmail()).orElseThrow(() -> new EmailNotFoundException("Email Not Found"));
 		}
 
-		catch (Exception e) {
-			throw new EmailNotFoundException("Email Not Found");
+		if (lu.getEmail() != null && !lu.getEmail().isEmpty()) {
+			lu1.setEmail(lu.getEmail());
 		}
+		if (lu.getPassword() != null && !lu.getPassword().isEmpty()) {
+			lu1.setPassword(lu.getPassword());
+		}
+		if (lu.getName() != null && !lu.getName().isEmpty()) {
+			lu1.setName(lu.getName());
+		}
+		if (lu.getImg() != null && lu.getImg().length != 0) {
+			lu1.setImg(lu.getImg());
+		}
+
+		return lur.save(lu1);
+
 	}
 
 	@Override
