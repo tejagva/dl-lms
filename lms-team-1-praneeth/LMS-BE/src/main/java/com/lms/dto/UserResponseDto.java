@@ -9,7 +9,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserResponseDto {
 
+	private long id;
+	
 	private String name;
+	
+	private String email;
 
 	private String token;
 
@@ -17,4 +21,6 @@ public class UserResponseDto {
 
 	private String image;
 
+	
+	
 }

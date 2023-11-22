@@ -32,32 +32,23 @@ public class JwtFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 
 		String jwtheader = request.getHeader("Authorization");
-
 		String token = null;
-
 		String username = null;
 
 		if (jwtheader != null && jwtheader.startsWith("Bearer ")) {
 			token = jwtheader.substring(7);
 			username = js.extractUsername(token);
-
 		}
-
 		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
 			UserDetails userDetails = uds.loadUserByUsername(username);
-
 			if (js.validateToken(token, userDetails)) {
 				UsernamePasswordAuthenticationToken at = new UsernamePasswordAuthenticationToken(userDetails, null,
 						userDetails.getAuthorities());
-
 				at.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				SecurityContextHolder.getContext().setAuthentication(at);
 			}
-
 		}
-
 		filterChain.doFilter(request, response);
 	}
-
 }

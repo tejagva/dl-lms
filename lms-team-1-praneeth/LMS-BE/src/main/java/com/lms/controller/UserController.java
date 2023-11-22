@@ -97,8 +97,8 @@ public class UserController {
 				HttpHeaders headers = new HttpHeaders();
 				headers.setContentType(MediaType.APPLICATION_JSON);
 
-				UserResponseDto ld2 = new UserResponseDto(output.get().getName(), genJwtToken, output.get().getRoles(),
-						img);
+				UserResponseDto ld2 = new UserResponseDto(output.get().getId(), output.get().getName(), jwt.getEmail(),
+						genJwtToken, output.get().getRoles(), img);
 
 				return ResponseEntity.ok().headers(headers).body(ld2);
 			} else {
@@ -194,6 +194,20 @@ public class UserController {
 		} else {
 			return new ResponseEntity<String>("Invalid OTP", HttpStatus.BAD_REQUEST);
 		}
+	}
+
+	@PostMapping("/resetpassword")
+	public ResponseEntity<?> saveNewPassword(@RequestParam("password") String password,
+			@RequestParam("verifypassword") String verifypassword, @RequestParam("id") long id) {
+
+		boolean resetPassword = lus.resetPassword(password, verifypassword, id);
+
+		if (resetPassword) {
+			return new ResponseEntity<String>("Reset Password Done", HttpStatus.OK);
+		} else {
+			return new ResponseEntity<String>("Unable To Reset Password", HttpStatus.BAD_REQUEST);
+		}
+
 	}
 
 }

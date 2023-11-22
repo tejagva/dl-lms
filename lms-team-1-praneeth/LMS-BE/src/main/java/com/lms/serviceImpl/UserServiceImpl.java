@@ -133,7 +133,7 @@ public class UserServiceImpl implements UserService {
 			lu1.setEmail(lu.getEmail());
 		}
 		if (lu.getPassword() != null && !lu.getPassword().isEmpty()) {
-			lu1.setPassword(lu.getPassword());
+			lu1.setPassword(pe.encode(lu.getPassword()));
 		}
 		if (lu.getName() != null && !lu.getName().isEmpty()) {
 			lu1.setName(lu.getName());
@@ -166,6 +166,7 @@ public class UserServiceImpl implements UserService {
 
 			if (findByemail.get().getOtp().equals(otp) && Duration
 					.between(findByemail.get().getOtpGeneratedTime(), LocalDateTime.now()).getSeconds() < (1 * 60)) {
+
 				return true;
 			} else {
 				return false;
@@ -173,6 +174,17 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception e) {
 			throw new EmailNotFoundException("Email Not Found");
 		}
+	}
+
+	@Override
+	public boolean resetPassword(String password, String verifypassword, long id) {
+
+		User findById = lur.findById(id).orElseThrow(() -> new CustomException("Invalid Id"));
+		if (password.equals(verifypassword)) {
+			findById.setPassword(pe.encode(verifypassword));
+			return true;
+		}
+		return false;
 	}
 
 }

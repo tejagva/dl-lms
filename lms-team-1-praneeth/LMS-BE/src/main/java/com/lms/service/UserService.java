@@ -37,4 +37,6 @@ public interface UserService {
 
 	boolean saveotp(UserVerifyDto uvt);
 
+	boolean resetPassword(String password, String verifypassword,long id);
+
 }
