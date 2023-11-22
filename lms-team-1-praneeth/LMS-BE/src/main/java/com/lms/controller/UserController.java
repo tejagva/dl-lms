@@ -78,8 +78,9 @@ public class UserController {
 	 * 
 	 */
 
-	@PostMapping(value = "/login")
-	public ResponseEntity<?> getJwtToken(@RequestBody @Valid UserDto jwt) throws IOException, DataFormatException {
+	@PostMapping("/login")
+	public ResponseEntity<UserResponseDto> getJwtToken(@RequestBody @Valid UserDto jwt)
+			throws IOException, DataFormatException {
 
 		try {
 			Authentication authenticate = am
@@ -134,7 +135,7 @@ public class UserController {
 	 */
 
 	@PostMapping("/upload")
-	public ResponseEntity<?> uploadImage(
+	public ResponseEntity<String> uploadImage(
 			@RequestPart("file") @Valid @Size(max = 50000, message = "Image size is greater than 5MB") MultipartFile mp,
 			String email) throws Exception {
 
@@ -154,7 +155,7 @@ public class UserController {
 	 */
 
 	@GetMapping("/{email}")
-	public ResponseEntity<?> downloadImage(@PathVariable("email") String email)
+	public ResponseEntity<String> downloadImage(@PathVariable("email") String email)
 			throws IOException, DataFormatException {
 		byte[] imageData = lus.downloadImage(email);
 		String encodeToString = Base64.getEncoder().encodeToString(imageData);
@@ -162,6 +163,12 @@ public class UserController {
 		return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.TEXT_HTML).body(img);
 
 	}
+
+	/*
+	 * 
+	 * API used to update the details of user
+	 * 
+	 */
 
 	@PutMapping("/update")
 	public ResponseEntity<String> learnerUserUpdate(@RequestBody User lu) {
@@ -172,8 +179,14 @@ public class UserController {
 
 	}
 
-	@GetMapping("/getotp")
-	public ResponseEntity<?> getotp(@RequestParam String email) throws Exception {
+	/*
+	 * 
+	 * API used to get otp for generating the otp for verify the account
+	 * 
+	 */
+
+	@PostMapping("/getotp")
+	public ResponseEntity<String> getotp(@RequestParam String email) throws Exception {
 
 		String generateOtp = otps.generateOtp();
 
@@ -185,7 +198,13 @@ public class UserController {
 		return new ResponseEntity<String>("OTP SENT", HttpStatus.OK);
 	}
 
-	@GetMapping("/verifyotp")
+	/*
+	 * 
+	 * API used to verify the otp for verify the user and reseting the password
+	 * 
+	 */
+
+	@GetMapping("/verifyacc")
 	public ResponseEntity<String> verifyAccount(@RequestParam("email") String email, @RequestParam("otp") String otp) {
 		boolean verifyAccount = lus.verifyAccount(email, otp);
 
@@ -196,8 +215,14 @@ public class UserController {
 		}
 	}
 
+	/*
+	 * 
+	 * API used to reset the password
+	 * 
+	 */
+
 	@PostMapping("/resetpassword")
-	public ResponseEntity<?> saveNewPassword(@RequestParam("password") String password,
+	public ResponseEntity<String> saveNewPassword(@RequestParam("password") String password,
 			@RequestParam("verifypassword") String verifypassword, @RequestParam("id") long id) {
 
 		boolean resetPassword = lus.resetPassword(password, verifypassword, id);

@@ -22,7 +22,7 @@ public class EmailService {
 		mimeMessageHelper.setText(
 				"""
 						<div>
-						  <a href="http://localhost:8080/user/verifyotp?email=%s&otp=%s" target="_blank">click link to verify</a>
+						  <a href="http://localhost:8080/user/verifyacc?email=%s&otp=%s" target="_blank">click link to verify</a>
 						</div>
 						"""
 						.formatted(email, otp),
@@ -31,23 +31,4 @@ public class EmailService {
 		jms.send(mimeMessage);
 	}
 
-	
-	public void sendPassword(String email, String otp) throws MessagingException {
-		MimeMessage mimeMessage = jms.createMimeMessage();
-		MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);
-		mimeMessageHelper.setTo(email);
-		mimeMessageHelper.setSubject("Reset Password");
-		mimeMessageHelper.setText(
-				"""
-						<div>
-						  <a href="http://localhost:8080/user/verifyotp?email=%s&otp=%s" target="_blank">click link to verify</a>
-						</div>
-						"""
-						.formatted(email, otp),
-				true);
-
-		jms.send(mimeMessage);
-	}
-	
-	
 }
