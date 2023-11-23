@@ -217,7 +217,7 @@ public class UserController {
 
 	/*
 	 * 
-	 * API used to reset the password
+	 * API used to reset the password and save the new password
 	 * 
 	 */
 
